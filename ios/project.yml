@@ -1,0 +1,41 @@
+name: CFST
+options:
+  bundleIdPrefix: com.example
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+targets:
+  CFST:
+    type: application
+    platform: iOS
+    sources:
+      - path: CFST
+      - path: ../ip.txt
+        buildPhase: resources
+      - path: ../ipv6.txt
+        buildPhase: resources
+    dependencies:
+      # gomobile bind 生成的静态 framework，由 ./build-go.sh 生成
+      - framework: Frameworks/Cfst.xcframework
+        embed: false
+    info:
+      path: CFST/Info.plist
+      properties:
+        CFBundleDisplayName: CF 优选
+        CFBundleShortVersionString: "1.0.0"
+        CFBundleVersion: "1"
+        UILaunchScreen: {}
+        UIApplicationSupportsIndirectInputEvents: true
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.example.cfst
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: ""
+        TARGETED_DEVICE_FAMILY: "1"
+        ENABLE_BITCODE: NO
+        OTHER_LDFLAGS: ["-lresolv"]

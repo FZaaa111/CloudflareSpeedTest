@@ -59,6 +59,11 @@ func (cf *CloudflareIPData) getLossRate() float32 {
 	return cf.lossRate
 }
 
+// LossRate 丢包率
+func (cf *CloudflareIPData) LossRate() float32 {
+	return cf.getLossRate()
+}
+
 func (cf *CloudflareIPData) toString() []string {
 	result := make([]string, 7)
 	result[0] = cf.IP.String()

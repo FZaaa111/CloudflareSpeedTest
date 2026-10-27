@@ -55,7 +55,7 @@ func NewPing() *Ping {
 		ips:     ips,
 		csv:     make(utils.PingDelaySet, 0),
 		control: make(chan bool, Routines),
-		bar:     utils.NewBar(len(ips), "可用:", ""),
+		bar:     utils.NewBar(len(ips), "可用:", "").WithStage("ping"),
 	}
 }
 
@@ -69,6 +69,9 @@ func (p *Ping) Run() utils.PingDelaySet {
 		utils.Cyan.Printf("开始延迟测速（模式：TCP, 端口：%d, 范围：%v ~ %v ms, 丢包：%.2f)\n", TCPPort, utils.InputMinDelay.Milliseconds(), utils.InputMaxDelay.Milliseconds(), utils.InputMaxLossRate)
 	}
 	for _, ip := range p.ips {
+		if IsCanceled() { // 已取消测速，不再启动新的延迟测速
+			break
+		}
 		p.wg.Add(1)
 		p.control <- false
 		go p.start(ip)

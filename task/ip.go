@@ -8,7 +8,10 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync/atomic"
 	"time"
+
+	"github.com/XIU2/CloudflareSpeedTest/utils"
 )
 
 const defaultInputFile = "ip.txt"
@@ -19,7 +22,26 @@ var (
 	// IPFile is the filename of IP Rangs
 	IPFile = defaultInputFile
 	IPText string
+	// StrictIP 为 true 时遇到无法解析的 IP 段直接退出程序（命令行行为），为 false 时跳过该 IP 段
+	StrictIP = true
+
+	canceled int32
 )
+
+// Cancel 取消正在进行的测速
+func Cancel() {
+	atomic.StoreInt32(&canceled, 1)
+}
+
+// ResetCancel 重置取消状态
+func ResetCancel() {
+	atomic.StoreInt32(&canceled, 0)
+}
+
+// IsCanceled 是否已取消测速
+func IsCanceled() bool {
+	return atomic.LoadInt32(&canceled) == 1
+}
 
 func InitRandSeed() {
 	rand.Seed(time.Now().UnixNano())
@@ -66,11 +88,18 @@ func (r *IPRanges) fixIP(ip string) string {
 }
 
 // 解析 IP 段，获得 IP、IP 范围、子网掩码
-func (r *IPRanges) parseCIDR(ip string) {
+func (r *IPRanges) parseCIDR(ip string) bool {
 	var err error
 	if r.firstIP, r.ipNet, err = net.ParseCIDR(r.fixIP(ip)); err != nil {
-		log.Fatalln("ParseCIDR err", err)
+		if StrictIP {
+			log.Fatalln("ParseCIDR err", err)
+		}
+		if utils.Debug { // 调试模式下，输出更多信息
+			utils.Red.Printf("[调试] 跳过无法解析的 IP 段: %s, 错误信息: %v\n", ip, err)
+		}
+		return false
 	}
+	return true
 }
 
 func (r *IPRanges) appendIPv4(d byte) {
@@ -156,8 +185,10 @@ func loadIPRanges() []*net.IPAddr {
 			if IP == "" {              // 跳过空的（即开头、结尾或连续多个 ,, 的情况）
 				continue
 			}
-			ranges.parseCIDR(IP) // 解析 IP 段，获得 IP、IP 范围、子网掩码
-			if isIPv4(IP) {      // 生成要测速的所有 IPv4 / IPv6 地址（单个/随机/全部）
+			if !ranges.parseCIDR(IP) { // 解析 IP 段，获得 IP、IP 范围、子网掩码
+				continue
+			}
+			if isIPv4(IP) { // 生成要测速的所有 IPv4 / IPv6 地址（单个/随机/全部）
 				ranges.chooseIPv4()
 			} else {
 				ranges.chooseIPv6()
@@ -178,8 +209,10 @@ func loadIPRanges() []*net.IPAddr {
 			if line == "" {                           // 跳过空行
 				continue
 			}
-			ranges.parseCIDR(line) // 解析 IP 段，获得 IP、IP 范围、子网掩码
-			if isIPv4(line) {      // 生成要测速的所有 IPv4 / IPv6 地址（单个/随机/全部）
+			if !ranges.parseCIDR(line) { // 解析 IP 段，获得 IP、IP 范围、子网掩码
+				continue
+			}
+			if isIPv4(line) { // 生成要测速的所有 IPv4 / IPv6 地址（单个/随机/全部）
 				ranges.chooseIPv4()
 			} else {
 				ranges.chooseIPv6()

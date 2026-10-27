@@ -1,0 +1,6 @@
+Frameworks/
+CFST.xcodeproj/
+.go.mod.bak
+.go.sum.bak
+xcuserdata/
+DerivedData/

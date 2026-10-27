@@ -4,7 +4,6 @@ import (
 	//"crypto/tls"
 
 	"io"
-	"log"
 	"net"
 	"net/http"
 	"regexp"
@@ -101,7 +100,9 @@ func (p *Ping) httping(ip *net.IPAddr) (int, time.Duration, string) {
 	for i := 0; i < PingTimes; i++ {
 		request, err := http.NewRequest(http.MethodHead, URL, nil)
 		if err != nil {
-			log.Fatal("意外的错误，情报告：", err)
+			if utils.Debug { // 调试模式下，输出更多信息
+				utils.Red.Printf("[调试] IP: %s, 延迟测速请求创建失败，错误信息: %v, 测速地址: %s\n", ip.String(), err, URL)
+			}
 			return 0, 0, ""
 		}
 		request.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.80 Safari/537.36")
