@@ -38,10 +38,13 @@ struct CloudflareAPI {
     func verifyCredentials() async throws -> String {
         switch credentials.authType {
         case .apiToken:
-            struct TokenStatus: Decodable { let status: String }
-            let r: TokenStatus = try await request("GET", "/user/tokens/verify")
-            guard r.status == "active" else { throw CFError(message: "Token 状态：\(r.status)") }
-            return "API Token 有效（active）"
+            // 不使用 /user/tokens/verify：它只认用户令牌，账户令牌会返回 1000 Invalid API Token。
+            // 列出 Zone 对两种令牌都适用，同时能确认令牌有 Zone 读取权限。
+            let zones: [CFZone] = try await request("GET", "/zones", query: ["per_page": "50"])
+            guard !zones.isEmpty else {
+                throw CFError(message: "Token 有效，但无法访问任何域名。请在令牌的「区域资源」中包含你的域名，并授予 区域-Zone-读取 与 区域-DNS-编辑 权限")
+            }
+            return "API Token 有效，可访问 \(zones.count) 个域名：\(zones.map(\.name).joined(separator: ", "))"
         case .globalKey:
             struct User: Decodable { let email: String }
             let r: User = try await request("GET", "/user")

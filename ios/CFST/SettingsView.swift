@@ -28,7 +28,7 @@ struct SettingsView: View {
                 } header: {
                     Text("Cloudflare 凭证")
                 } footer: {
-                    Text("推荐使用 API Token：在 Cloudflare 控制台「我的个人资料 → API 令牌」创建，权限需包含 区域-Zone-读取 与 区域-DNS-编辑。凭证保存在本机钥匙串中。")
+                    Text("推荐使用 API Token：在 Cloudflare 控制台「我的个人资料 → API 令牌」创建，权限需包含 区域-Zone-读取 与 区域-DNS-编辑。用户令牌和账户令牌都支持。凭证保存在本机钥匙串中。")
                 }
 
                 Section {

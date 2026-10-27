@@ -31,7 +31,7 @@ open CFST.xcodeproj
 
 ## Cloudflare 凭证
 
-推荐使用 **API Token**：Cloudflare 控制台 → 我的个人资料 → API 令牌 → 创建令牌（可用「编辑区域 DNS」模板），权限需要：
+推荐使用 **API Token**：Cloudflare 控制台 → 我的个人资料 → API 令牌（用户令牌），或 账户主页 → 管理账户 → 账户 API 令牌（账户令牌），两种都支持。创建令牌时可用「编辑区域 DNS」模板，权限需要：
 
 - 区域 → Zone → 读取
 - 区域 → DNS → 编辑
