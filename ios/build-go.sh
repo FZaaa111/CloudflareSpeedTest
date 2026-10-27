@@ -9,6 +9,15 @@ OUT="$IOS_DIR/Frameworks/Cfst.xcframework"
 
 export PATH="$PATH:$(go env GOPATH)/bin"
 
+# gomobile 编译 iOS 需要完整的 Xcode（仅安装 Command Line Tools 不够）
+if ! xcrun xcodebuild -version >/dev/null 2>&1; then
+	echo "错误：未找到 Xcode（当前开发者目录：$(xcode-select -p 2>/dev/null || echo 未设置)）。" >&2
+	echo "请从 App Store 安装 Xcode 并至少打开一次，然后执行：" >&2
+	echo "  sudo xcode-select -s /Applications/Xcode.app/Contents/Developer" >&2
+	echo "  sudo xcodebuild -license accept" >&2
+	exit 1
+fi
+
 if ! command -v gomobile >/dev/null 2>&1; then
 	echo "安装 gomobile..."
 	go install golang.org/x/mobile/cmd/gomobile@latest
