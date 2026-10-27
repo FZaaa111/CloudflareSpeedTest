@@ -34,6 +34,9 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.example.cfst
+        # App 模块名不能叫 CFST：macOS 文件系统不区分大小写，会与 Go 生成的 Cfst 模块冲突
+        # （报错 Cannot load module 'CFST' as 'Cfst'）
+        PRODUCT_MODULE_NAME: CFSTApp
         CODE_SIGN_STYLE: Automatic
         DEVELOPMENT_TEAM: ""
         TARGETED_DEVICE_FAMILY: "1"
