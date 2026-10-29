@@ -29,6 +29,28 @@ open CFST.xcodeproj
 
 > `build-go.sh` 会临时往 `go.mod` 添加 `golang.org/x/mobile` 依赖，构建结束后自动还原，不影响命令行版本。
 
+## 导出 .ipa / 分享给朋友
+
+```bash
+cd ios
+./build-ipa.sh         # 生成 dist/CFST.ipa（未签名）
+```
+
+`.ipa` 是 iOS 安装包。这里生成的是**未签名**的包，不能直接装，要用下面任一工具在安装时用**安装者自己的 Apple ID** 签名：
+
+| 工具 | 平台 | 有效期 | 说明 |
+|---|---|---|---|
+| [Sideloadly](https://sideloadly.io) | Mac / Windows | 7 天（免费 Apple ID） | 最简单：数据线连接 iPhone，把 `.ipa` 拖进窗口，填 Apple ID，点 Start |
+| [AltStore](https://altstore.io) | Mac / Windows + iPhone | 7 天，自动续签 | 电脑上运行 AltServer，同一 Wi-Fi 下后台续签 |
+| [SideStore](https://sidestore.io) | iPhone | 7 天，手机上自己续签 | 首次需电脑配置，之后不用电脑 |
+| [TrollStore](https://github.com/opa334/TrollStore) | iPhone | 永久 | 仅支持部分 iOS 版本 |
+
+安装后都需要在 iPhone 上：打开 **设置 → 隐私与安全性 → 开发者模式**；首次打开前在 **设置 → 通用 → VPN 与设备管理** 中信任对应的 Apple ID。
+
+有付费开发者账号时，更推荐 Xcode **Product → Archive → Distribute App → TestFlight**，朋友通过 TestFlight 安装和更新。
+
+> 每个人应使用自己的 Cloudflare Token。本项目为 GPL-3.0 协议，公开分发安装包时请同时提供源码（附上仓库链接即可）。
+
 ## Cloudflare 凭证
 
 推荐使用 **API Token**：Cloudflare 控制台 → 我的个人资料 → API 令牌（用户令牌），或 账户主页 → 管理账户 → 账户 API 令牌（账户令牌），两种都支持。创建令牌时可用「编辑区域 DNS」模板，权限需要：

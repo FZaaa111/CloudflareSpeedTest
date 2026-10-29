@@ -4,3 +4,5 @@ CFST.xcodeproj/
 .go.sum.bak
 xcuserdata/
 DerivedData/
+build/
+dist/
